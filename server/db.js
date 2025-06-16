@@ -36,7 +36,6 @@ export const saveTransaction = async (transaction) => {
   const values = [description, amount, category, transaction_date];
 
   const res = await pool.query(text, values);
-  //console.log(res.rows[0]);
   return res.rows[0];
 };
 

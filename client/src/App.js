@@ -3,7 +3,10 @@ import { useState, useEffect } from "react";
 
 function App() {
   const [transactions, setTransactions] = useState([]);
+  const [linkToken, setLinkToken] = useState(null);
+
   const [loading, setLoading] = useState(true);
+  const [linkTokenLoading, setLinkTokenLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
@@ -24,9 +27,32 @@ function App() {
     };
 
     fetchTransactions();
-  }, []); //empty dep array ensures this runs only once on mount
+  }, []);
 
-  console.log("transactions", transactions);
+  // fetch link_token from Plaid API
+  useEffect(() => {
+    const fetchLinkToken = async () => {
+      setLinkTokenLoading(true);
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/create_link_token",
+          { method: "POST" }
+        );
+        const data = await response.json();
+        setLinkToken(data.link_token);
+      } catch (error) {
+        console.error(
+          "Plaid Error:",
+          error.response?.data || error.message || error
+        );
+      } finally {
+        setLinkTokenLoading(false);
+      }
+    };
+
+    fetchLinkToken();
+  }, []);
+
   if (loading) {
     return <p>Loading...</p>;
   }
